@@ -1,0 +1,5 @@
+Username,FirstName,LastName,OU,Group,Password,Title,Department
+nva,An,Nguyen Van,IT,G_IT,P@ssw0rd2026!,System Administrator,IT
+ltt,Trang,Le Thi,KinhDoanh,G_KinhDoanh,P@ssw0rd2026!,Sales Specialist,Kinh Doanh
+ptm,Minh,Pham Tran,NhanSu,G_NhanSu,P@ssw0rd2026!,HR Executive,Nhan Su
+pvh,Hung,Phan Van,BanGiamDoc,G_BanGiamDoc,P@ssw0rd2026!,Director,Ban Giam Doc
