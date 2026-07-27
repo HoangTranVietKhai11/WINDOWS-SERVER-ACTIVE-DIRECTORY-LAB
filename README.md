@@ -42,7 +42,7 @@ Dưới đây là các năng lực cốt lõi được chứng minh qua dự án
 ```mermaid
 graph TD
     subgraph Host_OS [" Ubuntu Linux Host OS "]
-        VMware["VMware Workstation / VirtualBox for Linux"]
+        VMware["VMware Workstation Pro"]
         UbuntuClient["Ubuntu Host / Remote Laptop<br/>(Tailscale Client - External Network)"]
     end
 
@@ -166,6 +166,5 @@ WINDOWS-SERVER-ACTIVE-DIRECTORY-LAB/
 - **Họ và tên**: Hoàng Trần Việt Khải
 - **Vị trí định hướng**: System Administrator / IT Infrastructure Engineer / Network & Security Specialist
 - **OS Máy chủ Lab**: Ubuntu Linux
-- **Email**: *(Thêm email của bạn tại đây)*
-- **LinkedIn**: *(Thêm link LinkedIn của bạn tại đây)*
+- **Email**: *hoangtranvietkhai@gmail.com*
 - **GitHub**: [github.com/HoangTranVietKhai11](https://github.com/HoangTranVietKhai11)
