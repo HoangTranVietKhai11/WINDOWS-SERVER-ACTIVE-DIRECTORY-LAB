@@ -8,20 +8,20 @@ Ghi nhận và hướng dẫn quy trình chẩn đoán các lỗi hạ tầng ph
 ## Sự cố 1: Lỗi "The server is not operational" khi máy Client Join Domain
 
 ### Triệu chứng
-Khi thực hiện Join máy trạm Client vào domain `khailab.local`, hệ thống trả về thông báo lỗi:
-> *"An Active Directory Domain Controller (AD DC) for the domain khailab.local could not be contacted. The server is not operational."*
+Khi thực hiện Join máy trạm Client vào domain `corp.local`, hệ thống trả về thông báo lỗi:
+> *"An Active Directory Domain Controller (AD DC) for the domain corp.local could not be contacted. The server is not operational."*
 
 ### Nguyên nhân cốt lõi
-Máy Client đang sử dụng IP tĩnh hoặc DNS tự động từ Router ngoài, chưa trỏ địa chỉ **Preferred DNS Server** về IP tĩnh của Domain Controller (`192.168.1.10`).
+Máy Client đang sử dụng IP tĩnh hoặc DNS tự động từ Router ngoài, chưa trỏ địa chỉ **Preferred DNS Server** về IP tĩnh của Domain Controller (`192.168.101.10`).
 
 ### Quy trình xử lý
 1. Trên máy Client, mở **Network Connections** (`ncpa.cpl`).
 2. Mở Properties card mạng > **Internet Protocol Version 4 (TCP/IPv4)**.
 3. Chọn *Use the following DNS server addresses*:
-   - **Preferred DNS server**: `192.168.1.10`
+   - **Preferred DNS server**: `192.168.101.10`
 4. Mở Command Prompt và kiểm tra lại phân giải tên miền:
    ```cmd
-   ping khailab.local
+   ping corp.local
    ```
 5. Thử thực hiện Join Domain lại.
 
@@ -30,7 +30,7 @@ Máy Client đang sử dụng IP tĩnh hoặc DNS tự động từ Router ngoà
 ## Sự cố 2: Ping tên miền thất bại dù Ping IP tĩnh thành công
 
 ### Triệu chứng
-Từ máy Client, chạy `ping 192.168.1.10` thành công (0% loss), nhưng chạy `ping khailab.local` thì nhận lỗi `Ping request could not find host khailab.local`.
+Từ máy Client, chạy `ping 192.168.101.10` thành công (0% loss), nhưng chạy `ping corp.local` thì nhận lỗi `Ping request could not find host corp.local`.
 
 ### Nguyên nhân cốt lõi
 - Bộ nhớ đệm DNS (DNS Cache) trên Client bị lỗi hoặc lưu bản ghi cũ.
@@ -44,7 +44,7 @@ Từ máy Client, chạy `ping 192.168.1.10` thành công (0% loss), nhưng ch�
    ```
 2. Kiểm tra thuộc tính DNS Suffix:
    - Mở `ncpa.cpl` > IPv4 Properties > **Advanced...** > tab **DNS**.
-   - Nhập vào mục *DNS suffix for this connection*: `khailab.local`.
+   - Nhập vào mục *DNS suffix for this connection*: `corp.local`.
 
 ---
 
@@ -90,5 +90,5 @@ Dịch vụ DNS, Netlogon hoặc KDC (Kerberos Key Distribution Center) trên Do
 2. **Trên máy trạm Client**:
    - Sử dụng công cụ `nltest` để xác minh khả năng tìm kiếm DC:
      ```cmd
-     nltest /dsgetdc:khailab.local
+     nltest /dsgetdc:corp.local
      ```

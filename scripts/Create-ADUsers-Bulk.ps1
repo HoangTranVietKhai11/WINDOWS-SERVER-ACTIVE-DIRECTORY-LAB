@@ -4,7 +4,7 @@
 .DESCRIPTION
     Script thực hiện:
     1. Đọc danh sách người dùng từ file users_data.csv.
-    2. Kiểm tra và tự động tạo Organizational Unit (OU) nếu chưa tồn tại.
+    2. Kiểm tra và tự động tạo Organizational Unit (OU) nếu chưa tồn tại (bao gồm OU cha CORP).
     3. Tạo tài khoản người dùng mới (New-ADUser), kích hoạt tài khoản và đặt mật khẩu.
     4. Thêm tài khoản người dùng vào Security Group tương ứng.
 .EXAMPLE
@@ -33,10 +33,25 @@ if (-not (Test-Path -Path $CsvPath)) {
 $DomainDN = (Get-ADDomain).DistinguishedName
 $Users = Import-Csv -Path $CsvPath -Encoding UTF8
 
+# Tên OU cha (Parent OU)
+$ParentOUName = "CORP"
+$ParentOUDN = "OU=$ParentOUName,$DomainDN"
+
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host " STARTING BULK AD USER CREATION PROCESS " -ForegroundColor Green
 Write-Host " Domain DN: $DomainDN" -ForegroundColor Cyan
+Write-Host " Parent OU: $ParentOUName" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
+
+# 0. Kiểm tra & Tạo OU cha CORP nếu chưa có
+try {
+    [void](Get-ADOrganizationalUnit -Identity $ParentOUDN -ErrorAction Stop)
+    Write-Host "[i] OU cha '$ParentOUName' đã tồn tại." -ForegroundColor DarkGray
+}
+catch {
+    Write-Host "[+] Tạo mới OU cha: $ParentOUName ($ParentOUDN)" -ForegroundColor Yellow
+    New-ADOrganizationalUnit -Name $ParentOUName -Path $DomainDN -ProtectedFromAccidentalDeletion $false
+}
 
 foreach ($User in $Users) {
     $SamAccountName = $User.Username
@@ -49,15 +64,16 @@ foreach ($User in $Users) {
     $Title          = $User.Title
     $Department     = $User.Department
 
-    $TargetOUDN = "OU=$OUName,$DomainDN"
+    # Sub-OU nằm dưới OU cha CORP
+    $TargetOUDN = "OU=$OUName,$ParentOUDN"
 
-    # 1. Kiểm tra & Tạo OU nếu chưa có
+    # 1. Kiểm tra & Tạo Sub-OU nếu chưa có
     try {
         [void](Get-ADOrganizationalUnit -Identity $TargetOUDN -ErrorAction Stop)
     }
     catch {
         Write-Host "[+] Tạo mới OU: $OUName ($TargetOUDN)" -ForegroundColor Yellow
-        New-ADOrganizationalUnit -Name $OUName -Path $DomainDN -ProtectedFromAccidentalDeletion $false
+        New-ADOrganizationalUnit -Name $OUName -Path $ParentOUDN -ProtectedFromAccidentalDeletion $false
     }
 
     # 2. Tạo User

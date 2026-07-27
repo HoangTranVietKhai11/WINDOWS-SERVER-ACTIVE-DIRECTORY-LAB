@@ -1,7 +1,7 @@
 # Giai đoạn 1 — Triển khai Domain Controller (DC)
 
 ## Mục tiêu
-Khởi tạo máy chủ Domain Controller đầu tiên (First DC in New Forest) cho doanh nghiệp với tên miền gốc `khailab.local` trên nền tảng Windows Server 2022 (dựng dưới dạng máy ảo VM 1 trên hệ điều hành máy chủ Ubuntu Linux).
+Khởi tạo máy chủ Domain Controller đầu tiên (First DC in New Forest) cho doanh nghiệp với tên miền gốc `corp.local` trên nền tảng Windows Server 2022 (dựng dưới dạng máy ảo VM 1 trên hệ điều hành máy chủ Ubuntu Linux).
 
 ---
 
@@ -10,15 +10,15 @@ Khởi tạo máy chủ Domain Controller đầu tiên (First DC in New Forest) 
 ### 0. Chuẩn bị máy ảo trên Ubuntu Host (VMware / VirtualBox)
 - Mở phần mềm ảo hóa (**VMware Workstation** hoặc **VirtualBox**) trên máy chủ **Ubuntu Linux**.
 - Tạo VM mới: 2 vCPU, 4GB RAM, 60GB Disk, gắn ISO Windows Server 2022.
-- Card mạng máy ảo: Đặt thuộc tính card mạng ở chế độ **Host-Only** hoặc **LAN Segment** (mạng ảo nội bộ dải `192.168.1.0/24`).
+- Card mạng máy ảo: Đặt thuộc tính card mạng ở chế độ **Host-Only** hoặc **LAN Segment** (mạng ảo nội bộ dải `192.168.101.0/24`).
 
 ### 1. Cấu hình địa chỉ IP tĩnh trên Windows Server
 - Mở **Control Panel** > **Network and Sharing Center** > **Change adapter settings**.
 - Nhấp chuột phải vào card mạng > **Properties** > chọn **Internet Protocol Version 4 (TCP/IPv4)**.
 - Thiết lập thông số theo kế hoạch:
-  - **IP Address**: `192.168.1.10`
+  - **IP Address**: `192.168.101.10`
   - **Subnet Mask**: `255.255.255.0`
-  - **Default Gateway**: `192.168.1.1`
+  - **Default Gateway**: `192.168.101.1`
   - **Preferred DNS Server**: `127.0.0.1` (sau khi promote, server tự trỏ về chính mình).
 
 ### 2. Đổi tên máy chủ Server
@@ -38,19 +38,21 @@ Khởi tạo máy chủ Domain Controller đầu tiên (First DC in New Forest) 
 - Sau khi cài xong Role, nhấp vào thông báo ở góc trên Server Manager > chọn **Promote this server to a domain controller**.
 - **Deployment Configuration**:
   - Chọn option: **Add a new forest**.
-  - Nhập **Root domain name**: `khailab.local`.
+  - Nhập **Root domain name**: `corp.local`.
 - **Domain Controller Options**:
   - *Forest / Domain functional level*: **Windows Server 2016** (hoặc cao hơn).
   - Đảm bảo đánh dấu chọn: **Domain Name System (DNS) server** và **Global Catalog (GC)**.
   - Nhập mật khẩu **Directory Services Restore Mode (DSRM)** (lưu lại mật khẩu này cho mục đích khôi phục).
-- Giữ mặc định ở các bước DNS Options, NetBIOS Name (`KHAILAB`), Paths (`C:\Windows\NTDS` và `C:\Windows\SYSVOL`).
+- Giữ mặc định ở các bước DNS Options, NetBIOS Name (`CORP`), Paths (`C:\Windows\NTDS` và `C:\Windows\SYSVOL`).
 - Nhấn **Install** sau khi kiểm tra xong *Prerequisites Check*. Server sẽ tự khởi động lại.
+
+> **Phân tích**: Sử dụng đuôi `.local` trong môi trường lab hoặc nội bộ giúp tách biệt hoàn toàn với không gian tên miền Public trên Internet (như `.com`, `.vn`), tránh xung đột phân giải DNS nội bộ và bên ngoài.
 
 ---
 
 ## Kiểm thử & Xác nhận kết quả (Verification)
-1. Đăng nhập vào Server bằng tài khoản Domain: `KHAILAB\Administrator`.
-2. Mở công cụ **Active Directory Users and Computers** (`dsa.msc`) để xác nhận domain `khailab.local` đã hoạt động.
+1. Đăng nhập vào Server bằng tài khoản Domain: `CORP\Administrator`.
+2. Mở công cụ **Active Directory Users and Computers** (`dsa.msc`) để xác nhận domain `corp.local` đã hoạt động.
 3. Mở **Command Prompt** (Run as Administrator) và chạy lệnh kiểm tra sức khỏe DC:
    ```cmd
    dcdiag /test:dns
